@@ -1,0 +1,9 @@
+Conditions
+
+Our software is all copyrighted by the contributers of Simulation Exercises and 7th International School/Symposium for Space Simulations (ISSS-7). We developed the software using MATLAB(R). (C)1984-2004 The MathWorks, Inc. Our limited rights to our software are governed by a certain license agreement between The MathWorks, Inc. and us.
+
+Redistribution and use of our software in source and binary forms, with or without modification, and all derivatives of our software are permitted provided that it is not for commercial purpose. You are requested to acknowledge use of the code if you publish the results of computer simulations using KEMPO1 or its modified version in the journals.
+
+We make no warranty that our software reproduce fully accurate physical process under arbitrary initial parameters.
+
+Our software is furnished "as is". We make no warranty, express or implied, that our software is free of error, or is consistent with any particular standard of merchantability, or that it will meet your requirements for any particular application. We accept no responsibility for any mathematical or technical limitations of the procedures and functions which make up our software. Our software should not be relied on for solving a problem whose incorrect solution could result in injury to a person or loss of property. Neither committees of 7th International School/Symposium for Space Simulations (ISSS-7), nor Research Institute for Sustainable Humanosphere (RISH), nor Kyoto University, nor contributors shall in any event be liable for any damages, whether direct or indirect, special or general, consequential or incidental, arising from use of our software. Your use of our software is entirely at your own risk.

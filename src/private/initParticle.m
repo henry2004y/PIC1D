@@ -15,12 +15,20 @@ npt = prm.npt;
 vpa = prm.vpa; vpe = prm.vpe; vd = prm.vd;
 slx = prm.slx; nx = prm.nx; np = prm.np; ns = prm.ns;
 cs = prm.cs; angle = prm.angle; pch = prm.pch;
+UseGPU = prm.UseGPU;
 
-% Allocation 
-x  = zeros(npt,1);
-vx = zeros(npt,1);
-vy = zeros(npt,1);
-vz = zeros(npt,1);
+% Allocation
+if ~UseGPU
+   x  = zeros(npt,1);
+   vx = zeros(npt,1);
+   vy = zeros(npt,1);
+   vz = zeros(npt,1);
+else
+   x  = zeros(npt,1,'gpuArray');
+   vx = zeros(npt,1,'gpuArray');
+   vy = zeros(npt,1,'gpuArray');
+   vz = zeros(npt,1,'gpuArray');
+end
 
 % Initialization
 n2 = 0;
@@ -56,7 +64,7 @@ for k=1:ns
       uyi = vpe(k)*randn + vdpe*cos(phase);
       uz  = vpe(k)*randn + vdpe*sin(phase);
       
-      % rotation to the direction of the magnetic field
+      % Rotation to the direction of the magnetic field
       costh = cos(pi/180*angle);
       sinth = sin(pi/180*angle);
       ux = costh*uxi - sinth*uyi;

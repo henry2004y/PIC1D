@@ -13,6 +13,7 @@ function [prm,ren] = setParameters(fname,DoReadDirect)
 
 if nargin==0
    fname = '../init/default.dat';  % default input filename
+   DoReadDirect = false;
 elseif nargin ==1
    DoReadDirect = false;
 end
@@ -27,6 +28,7 @@ catch
 end
 
 % Set parameters directly from input file
+prm.UseGPU = false;
 for l=1:length(StrName)
    value = eval(char(StrValue(l)));
    prmname = strtrim(StrName{l});
@@ -87,6 +89,8 @@ for l=1:length(StrName)
          prm.diagtype = value;
       case 'angle'
          prm.angle = value;
+      case 'UseGPU'
+         prm.UseGPU = value;
       otherwise
          error('Plese check input parameter %s.',prmname)
    end
@@ -107,14 +111,25 @@ prm.slx = prm.nx;
 prm.npt = sum(prm.np(1:prm.ns));
 prm.nxp1 = prm.nx+1;
 prm.nxp2 = prm.nx+2;
-prm.X1 = 1:prm.nx; prm.X2 = 2:(prm.nx+1); prm.X3 = 3:(prm.nx+2);
+if prm.UseGPU
+   prm.X1 = gpuArray(1:prm.nx);
+   prm.X2 = gpuArray(2:(prm.nx+1));
+   prm.X3 = gpuArray(3:(prm.nx+2));
+else
+   prm.X1 = 1:prm.nx; prm.X2 = 2:(prm.nx+1); prm.X3 = 3:(prm.nx+2);
+end
 prm.cs = prm.cv^2;
 prm.tcs = 2*prm.cs;
 prm.q = prm.nx ./ prm.np(1:prm.ns) .* (prm.wp(1:prm.ns).^2) ./ ...
             prm.qm(1:prm.ns);
 prm.mass = prm.q ./ prm.qm(1:prm.ns);
-prm.rho0 = -sum(prm.q(1:prm.ns) .* prm.np(1:prm.ns)) / prm.nx *...
-            ones(prm.nxp2,1);
+if prm.UseGPU
+   prm.rho0 = -sum(prm.q(1:prm.ns) .* prm.np(1:prm.ns)) / prm.nx *...
+      ones(prm.nxp2,1,'gpuArray');
+else
+   prm.rho0 = -sum(prm.q(1:prm.ns) .* prm.np(1:prm.ns)) / prm.nx *...
+      ones(prm.nxp2,1);
+end
 prm.bx0 = prm.wc/prm.qm(1)*cos(theta);
 prm.by0 = prm.wc/prm.qm(1)*sin(theta);
 prm.ifdiag = ceil(prm.ntime/prm.nplot);

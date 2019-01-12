@@ -8,9 +8,9 @@ vx = particle.vx; vy = particle.vy; vz = particle.vz;
 
 [view_az,view_el] = view;
 
-vvx = vx*ren.v;
-vvy = vy*ren.v;
-vvz = vz*ren.v;
+vvx = gather(vx*ren.v);
+vvy = gather(vy*ren.v);
+vvz = gather(vz*ren.v);
 
 m = prm.vmax*ren.v;
 

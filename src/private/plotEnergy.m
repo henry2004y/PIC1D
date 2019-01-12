@@ -6,7 +6,7 @@ function hdiag = plotEnergy(hdiag, jdiag, eng, prm, ren)
 ifdiag = prm.ifdiag;
 
 totaleng = sum(eng);
-en = [totaleng;eng(1,:);eng(2,:);eng(3,:)]*ren.s;
+en = gather([totaleng;eng(1,:);eng(2,:);eng(3,:)]*ren.s);
 
 if jdiag == 1
    t = (0:ifdiag:prm.ntime)*prm.dt;
@@ -31,7 +31,7 @@ if jdiag == 1
       catch
          
       end
-      hetxt(i) = text(t(jdiag),en(i,jdiag),str(i));
+      hetxt(i) = text(t(jdiag),gather(en(i,jdiag)),str(i));
       set(hetxt(i),'VerticalAlignment','bottom', ...
          'HorizontalAlignment','right', ...
          'FontWeight','bold')

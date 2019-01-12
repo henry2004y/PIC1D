@@ -1,6 +1,12 @@
 function field = current(particle, field, jtime, prm)
-% Calculate the current in one step
-
+%CURRENT Calculate the current in one step.
+%
+% The function used to be deal with one particle at a time with for loop. I
+% rewrite the kernel with matrix operations to make it at least 5 times
+% faster. 
+% Note that the results are not exactly the same for some tests! For each
+% step, it is down to machine precision, but as the timestep grows, you can
+% see small differences. To be honest, I don't know why.
 
 nx = prm.nx; nxp1 = prm.nxp1; nxp2 = prm.nxp2;
 X2 = prm.X2;
@@ -13,9 +19,15 @@ wj = prm.wj;
 x = particle.x;
 vx = particle.vx; vy = particle.vy; vz = particle.vz;
 
-ajx = zeros(nxp2,1);
-ajy = zeros(nxp2,1);
-ajz = zeros(nxp2,1);
+if prm.UseGPU
+   ajx = zeros(nxp2,1,'gpuArray');
+   ajy = zeros(nxp2,1,'gpuArray');
+   ajz = zeros(nxp2,1,'gpuArray');
+else
+   ajx = zeros(nxp2,1);
+   ajy = zeros(nxp2,1);
+   ajz = zeros(nxp2,1);
+end
 
 %----
 n2 = 0;
@@ -24,31 +36,34 @@ for k=1:ns
    n2 = n2 + np(k);
    qh = q(k)*0.5;
    
-   for m=(n1+1):n2
-      ih = floor(x(m) + 1.5);
-      s2 = (x(m) + 1.5 - ih)*q(k);
-      s1 = q(k) - s2;
-      ih1= ih + 1;
+   % This works for all the particles of this species together. For the old
+   % scheme per particle, see the original source code or the review
+   % history.
+   m = (n1+1):n2;
+   ih = floor(x(m) + 1.5);
+   s2 = (x(m) + 1.5 - ih)*q(k);
+   s1 = q(k) - s2;
+   
+   iMax = max(ih);
+   ajy(1:iMax)   = ajy(1:iMax)   + accumarray(ih,vy(m).*s1);
+   ajy(2:iMax+1) = ajy(2:iMax+1) + accumarray(ih,vy(m).*s2);
+   ajz(1:iMax)   = ajz(1:iMax)   + accumarray(ih,vz(m).*s1);
+   ajz(2:iMax+1) = ajz(2:iMax+1) + accumarray(ih,vz(m).*s2);
+
+   %-- charge conservation method --
+   if prm.iex
+      qhs = qh * sign(vx(m));
+      avx = abs(vx(m));
       
-      ajy(ih)  = ajy(ih)  + vy(m)*s1;
-      ajy(ih1) = ajy(ih1) + vy(m)*s2;
+      x1 = x(m) + 2.0 - avx;
+      x2 = x(m) + 2.0 + avx;
+      i1 = floor(x1);
+      i2 = floor(x2);
       
-      ajz(ih)  = ajz(ih)  + vz(m)*s1;
-      ajz(ih1) = ajz(ih1) + vz(m)*s2;
-      
-      %-- charge conservation method --
-      if prm.iex
-         qhs = qh * sign(vx(m));
-         avx = abs(vx(m));
-         
-         x1 = x(m) + 2.0 - avx;
-         x2 = x(m) + 2.0 + avx;
-         i1 = floor(x1);
-         i2 = floor(x2);
-         
-         ajx(i1) = ajx(i1) + (i2 - x1)*qhs;
-         ajx(i2) = ajx(i2) + (x2 - i2)*qhs;
-      end
+      iMax = max(i1);
+      ajx(1:iMax) = ajx(1:iMax) + accumarray(i1,(i2 - x1).*qhs);
+      iMax = max(i2);
+      ajx(1:iMax) = ajx(1:iMax) + accumarray(i2,(x2 - i2).*qhs);
    end
 end
 

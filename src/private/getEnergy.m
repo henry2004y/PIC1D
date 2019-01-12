@@ -14,8 +14,12 @@ by = field.by; bz = field.bz;
 
 vx = particle.vx; vy = particle.vy; vz = particle.vz;
 
-eng = zeros(3,1);
-
+if prm.UseGPU
+   eng = zeros(3,1,'gpuArray');
+else
+   eng = zeros(3,1);
+end
+   
 % electric energy
 te = sum(ex(X2).^2 + ey(X2).^2 + ez(X2).^2);
 eng(1) = 0.5*te/nx;

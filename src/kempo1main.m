@@ -37,14 +37,12 @@ function kempo1main(fname)
 % Renaming functions and variables. 10/20/2018
 %****************************************************************
 
-
 %% Read parameters and normalization
 if nargin ~= 0
    [prm,ren] = setParameters(fname);
 else
    [prm,ren] = setParameters;
 end
-
 
 %% Initialization
 particle = initParticle(prm);

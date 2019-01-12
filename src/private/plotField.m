@@ -39,7 +39,7 @@ if jdiag == 1
    str = {'Ex','Ey','Ez','By','By'};
    ylabel(str(n))
 else
-   set(hdiag.plt(hdiag.nplt).hplot(n),'ydata',f(X2))
+   set(hdiag.plt(hdiag.nplt).hplot(n),'ydata',gather(f(X2)))
 end
 
 end

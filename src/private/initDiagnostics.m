@@ -12,14 +12,20 @@ hdiag.flag_rot = 0;       % for rotate3d
 hdiag.flag_field = 0;     % 0: do nothing, 1: save field data
 hdiag.flag_eng = 0;       % 0: do nothing, 1: save energy data
 hdiag.flag_kspec = 0;     % 0: do nothing, 1: save k-spectrum data
-  
+
 % Initialization of output vars
-output.fieldsave = nan(5, prm.nxp2, prm.nplot+1);
-output.kspecsave = nan(5, prm.nx/2, prm.nplot+1);
-output.engsave = zeros(3,prm.nplot+1);
+if prm.UseGPU
+   output.fieldsave = nan(5, prm.nxp2, prm.nplot+1,'gpuArray');
+   output.kspecsave = nan(5, prm.nx/2, prm.nplot+1,'gpuArray');
+   output.engsave = zeros(3,prm.nplot+1,'gpuArray');
+else
+   output.fieldsave = nan(5, prm.nxp2, prm.nplot+1);
+   output.kspecsave = nan(5, prm.nx/2, prm.nplot+1);
+   output.engsave = zeros(3,prm.nplot+1);
+end
 
 %
-% initialize graphics
+% Initialize graphics
 %
 hdiag.fig = figure;
 
@@ -35,44 +41,44 @@ colormap jet;
 
 %
 hdiag.color = [[       0          0   0.800000]; ... % blue
-               [       0   0.500000          0]; ... % green
-               [1.000000          0          0]; ... % red
-               [0.750000   0.750000          0]; ... % yellow
-               [0.750000          0   0.750000]; ... % magenta
-               [       0   0.750000   0.750000]; ... % cyan
-               [       0          0          0]];    % black
+   [       0   0.500000          0]; ... % green
+   [1.000000          0          0]; ... % red
+   [0.750000   0.750000          0]; ... % yellow
+   [0.750000          0   0.750000]; ... % magenta
+   [       0   0.750000   0.750000]; ... % cyan
+   [       0          0          0]];    % black
 
 %
 for l=1:length(prm.diagtype)
-  hdiag.axes(l) = subplot(2,ceil(length(prm.diagtype)/2),l);
-
-  %set(gca,'DrawMode','fast')
-  set(gca,'NextPlot','ReplaceChildren')
-
-  box on
-  set(gca,'TickDir','out')
-  set(gca,'TickLength',[0.018 0.07])
-  set(gca,'Layer','top')
-  set(gca,'ColorOrder',hdiag.color)
- 
-  hxlabel = get(gca,'xlabel');
-  set(hxlabel,'Units','Normalized');
-  set(hxlabel,'Position',[0.5,-0.13,10]);
-
-  switch prm.diagtype(l)
-   case {4,10}
-    view(-37.5,30);
-    grid on
-    hdiag.flag_rot = 1;
-   case 11
-    hdiag.flag_eng = 1;
-   case {20,21,22,23,24}
-    hdiag.flag_field = 1;
-   case {25,26,27,28,29}
-    hdiag.flag_field = 1;
-   case {30,31,32,33,34}
-    hdiag.flag_kspec = 1;
-  end
+   hdiag.axes(l) = subplot(2,ceil(length(prm.diagtype)/2),l);
+   
+   %set(gca,'DrawMode','fast')
+   set(gca,'NextPlot','ReplaceChildren')
+   
+   box on
+   set(gca,'TickDir','out')
+   set(gca,'TickLength',[0.018 0.07])
+   set(gca,'Layer','top')
+   set(gca,'ColorOrder',hdiag.color)
+   
+   hxlabel = get(gca,'xlabel');
+   set(hxlabel,'Units','Normalized');
+   set(hxlabel,'Position',[0.5,-0.13,10]);
+   
+   switch prm.diagtype(l)
+      case {4,10}
+         view(-37.5,30);
+         grid on
+         hdiag.flag_rot = 1;
+      case 11
+         hdiag.flag_eng = 1;
+      case {20,21,22,23,24}
+         hdiag.flag_field = 1;
+      case {25,26,27,28,29}
+         hdiag.flag_field = 1;
+      case {30,31,32,33,34}
+         hdiag.flag_kspec = 1;
+   end
 end
 
 axes(hdiag.axes(1))

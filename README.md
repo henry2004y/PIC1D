@@ -6,6 +6,7 @@ When I first looked at the source codes, I thought this code must be slow. I pla
 1. Why is my first OOP version so slow? Checking the restriction of class properties takes time; accessing and overwrite properties takes significant time.
 2. Using handle classes may not be a good idea if you want performance. I tried because it seems to be a clever way of mimicking pointers to pass arguments, but it turns out to be extremely inefficient.
 3. So, let's forget about OOP in MATLAB simulations...which is sad.
+4. I thought it should be easy to convert this to a GPU-enabled code, but obviously I was wrong. Because the functions like update velocity loop over all the particles one by one, making the velocities and positions into gpuArray doesn't help much. It would only benefit if I am doing matrix operations!
 
 # Improvements
 
@@ -15,6 +16,7 @@ When I first looked at the source codes, I thought this code must be slow. I pla
 4. Clearer comment style;
 5. Rename almost all the variables and functions following naming standards;
 6. Replace the old GUI designed by GUIDE with a new one by AppDesigner.
+7. Rewrite the kernel of velocity update and current calculation: replace the for loop with matrix operations. For the velocity update, the results are exactly the same; for the current calculation, I use Matlab built-in function accumarray, which give slightly different results for current down to machine precision for each timestep. I don't know the exact reason behind this, but I think it is due to the multithread usage of the built-in function, such that the sequence of reduction changes. Both of the new functions have about 5 to 10 times speedup.
 
 # Side notes
 

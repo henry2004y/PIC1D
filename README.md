@@ -20,8 +20,8 @@ When I first looked at the source codes, I thought this code must be slow. I pla
 
 # Side notes
 
-1. JIT is smart enough to handle ^2 as simple multiplication.
-2. rotate3d should be set only at the beginning, otherwise it will significantly affect the performance.
+1. JIT is smart enough to handle `^2` as simple multiplication. In fact, what really happens underneath is that during the compilation phase, `^` will be converted into multiplications, as is the case in [Julia](https://github.com/JuliaLang/julia/blob/bf534986350a991e4a1b29126de0342ffd76205e/base/math.jl#L922-L929) for power less than or equal to 3.
+2. `rotate3d` should be set only at the beginning, otherwise it will significantly affect the performance.
 
 # Copyrights
 
